@@ -8,8 +8,8 @@
 </p>
 
 ## OS Library to install
-- tesseract ocr
-- ghostcript
+- tesseract
+- ghostscript
 - poppler
 
 ## About Laravel
