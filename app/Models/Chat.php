@@ -24,7 +24,7 @@ class Chat extends Model
 
     public function History():HasMany
     {
-        return $this->hasMany(History::class,"chat_id","id");
+        return $this->hasMany(ChatHistory::class,"chat_id","id");
     }
 
 }

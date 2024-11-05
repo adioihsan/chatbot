@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ChatController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -19,6 +20,14 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    
+    // chat
+    Route::get('/chat',[ChatController::class,"index"])->name('chat');
+    Route::post('/chat/send/v1',[ChatController::class,"sendV1"])->name('chat.send');
+    Route::post('/chat/send/v2',[ChatController::class,"sendV2"])->name('chat.send');
+    Route::post('/chat/send/v3',[ChatController::class,"sendV3"])->name('chat.send');
+
+    // profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

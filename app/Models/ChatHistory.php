@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
-class History extends Model
+class ChatHistory extends Model
 {
     use HasUuids;
-    
+
     // Fix for uuid PK
     protected $primaryKey = 'id';
     protected $keyType = 'string';
