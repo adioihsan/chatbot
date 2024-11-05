@@ -12,6 +12,10 @@
 - ghostscript
 - poppler
 
+## Laravel Library with additional command to install:
+-  [openai/laravel](https://github.com/openai-php/laravel)
+-  [spatie/texttopdf](https://github.com/spatie/pdf-to-text)
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
