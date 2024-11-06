@@ -43,14 +43,15 @@ export default function Dashboard({response}) {
     })
     router.on("finish",()=>{
         setIsLoading(false);
-        setChatData({
-            files:[],
-            prompt:""
-        });
+  
     })
     useEffect(()=>{
         if(response?.length > 0){
-            setChatHistory(prev=> [...prev, {chatData,response}])
+            setChatHistory(prev=> [...prev, {prompt:` ${chatData.prompt} `,response}])
+            setChatData({
+                files:[],
+                prompt:""
+            });
         }
     },[response])
 
@@ -105,7 +106,7 @@ export default function Dashboard({response}) {
                             return (
                             <div className='mb-3'  key={"history-"+index}>
                                     <div  className=" overflow-hidden transition ease-in-out delay-150 bg-blue-50 shadow-sm sm:rounded-lg dark:bg-slate-600 p-3 mr-auto w-fit max-w-[90%] lg:max-w-[80%] mb-2">
-                                        {history.chatData.prompt}
+                                        {history.prompt}
                                     </div>
                                     <div  className="overflow-hidden transition ease-in-out delay-150 bg-white shadow-sm sm:rounded-lg dark:bg-gray-800 p-3 ml-auto w-fit max-w-[90%]  lg:max-w-[80%] mb-2">
                                         {history.response}
