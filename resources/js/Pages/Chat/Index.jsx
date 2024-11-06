@@ -15,7 +15,6 @@ export default function Dashboard({response}) {
         prompt:""
     })
     const [versionRoute,setVersionRoute] = useState("/chat/send/v1")
-
     const [chatHistory,setChatHistory] = useState([]);
     const [isLoading,setIsLoading] = useState(false);
     const fileRef = useRef(null);
@@ -64,9 +63,10 @@ export default function Dashboard({response}) {
                     </h2>
                     <select id="countries" onChange={(e)=>{setVersionRoute(e.target.value)}} 
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                        <option value="/chat/send/v1">Parse File to text</option>
-                        <option value="/chat/send/v2">Parse File to text using OCR </option>
-                        <option value="/chat/send/v3">Parse File to image</option>
+                        <option value="/chat/send/v1">V1 - Parse File to text</option>
+                        <option value="/chat/send/v2">V2 - Parse File to text using OCR </option>
+                        <option value="/chat/send/v3">V3 - Parse File to image base64</option>
+                        <option value="/chat/send/v4">V4 - Parse File to image url</option>
                 </select>
                 </div>
             }

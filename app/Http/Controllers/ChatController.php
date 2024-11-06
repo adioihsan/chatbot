@@ -12,6 +12,7 @@ use OpenAI\Laravel\Facades\OpenAI;
 use Illuminate\Support\Facades\DB;
 use Imagick;
 use Spatie\PdfToText\Pdf;
+use Illuminate\Support\Facades\Storage;
 
 class ChatController extends Controller
 {
@@ -190,6 +191,72 @@ class ChatController extends Controller
         }
     }
 
+    // Fourth Approacj
+    // pdf-> image -> cloud storage -> chatgpt
+    public function sendV4(ChatRequest $request)
+    {
+        try {
+            DB::beginTransaction();
+            $prompt = $request->validated("prompt");
+            $file = $request->validated("file");
+            $response = ''; // Initialize response variable
+
+            if (isset($request->chat_id)) {
+                $chat = Chat::find($request->chat_id);
+            } else {
+                $title = substr($prompt, 0, 30);
+                $chat = Chat::create([
+                    'user_id' => $request->user_id,
+                    'title' => $title,
+                ]);
+            }
+            if ($file) {
+                //  Convert pdf to images ,
+                $image_paths = $this->pdfToImages($file->getRealPath());
+                $image_urls = $this->uploadImagesToS3($image_paths);
+                //  Prepare prompt with
+                $images_prompt = array_map(function($image_url){
+                    return       [
+                        "type"=> "image_url",
+                        "image_url"=> [
+                            "url"=>  $image_url,
+                        ],
+                    ];
+                },$image_urls);
+ 
+                $prompt = [
+                    [
+                        "type"=>"text",
+                        "text"=> $request->validated("prompt"),
+                    ]
+                ];
+                $finalprompt = array_merge($prompt,$images_prompt);
+                
+                // Send prompt to GPT
+                $result = $this->createChatClient($finalprompt);
+                $response = $result->choices[0]->message->content;
+            } else {
+                $result = $this->createChatClient($prompt);
+                $response = $result->choices[0]->message->content;
+            }
+
+            // Save chat history
+            // ChatHistory::create([
+            //     'chat_id' => $chat->id,
+            //     'prompt' => $prompt,
+            //     'response' => $response,
+            // ]);
+
+            DB::commit();
+            return Inertia::render('Chat/Index', [
+                "response" => $response,
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            throw $th;
+        }
+    }
+
     private function createChatClient($prompt)
     {
         return OpenAI::chat()->create([
@@ -254,6 +321,16 @@ class ChatController extends Controller
             $text .= $output . "\n\n";
         }
         return $text;
+    }
+
+    private function uploadImagesToS3(array $imagePaths){
+        $urls = [];
+        foreach($imagePaths as $path){
+            $filename = basename($path);
+            Storage::disk('s3')->put($filename ,file_get_contents($path),'public');
+            $urls[] = Storage::disk('s3')->url($filename);
+        }
+        return $urls;
     }
     
     // public function createAssistantClient()

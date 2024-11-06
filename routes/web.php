@@ -26,6 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/chat/send/v1',[ChatController::class,"sendV1"])->name('chat.send');
     Route::post('/chat/send/v2',[ChatController::class,"sendV2"])->name('chat.send');
     Route::post('/chat/send/v3',[ChatController::class,"sendV3"])->name('chat.send');
+    Route::post('/chat/send/v4',[ChatController::class,"sendV4"])->name('chat.send');
 
     // profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
