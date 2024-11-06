@@ -35,7 +35,7 @@ class ChatRequest extends FormRequest
             case 'chat.send':
                 return[
                     "prompt" =>'required|string|max:500',
-                    "file" => "file|mimes:txt,pdf,docx|max:2048"
+                    "file" => "nullable|file|mimes:txt,pdf,docx|max:2048"
                 ];
             break;
             default:
