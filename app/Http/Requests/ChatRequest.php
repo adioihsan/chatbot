@@ -32,14 +32,17 @@ class ChatRequest extends FormRequest
     public function rules(): array
     {
         switch(($this->route()->getName())){
-            case 'chat.send':
+            case 'chat.send.v5':
+                return[
+                    "prompt" =>'required|string|max:500',
+                    "file" => "required|file|mimes:txt,pdf,docx|max:2048"
+                ];
+            break;
+            default:
                 return[
                     "prompt" =>'required|string|max:500',
                     "file" => "nullable|file|mimes:txt,pdf,docx|max:2048"
                 ];
-            break;
-            default:
-                return[];
             break;
         }
     }

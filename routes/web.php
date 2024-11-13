@@ -23,10 +23,11 @@ Route::middleware('auth')->group(function () {
     
     // chat
     Route::get('/chat',[ChatController::class,"index"])->name('chat');
-    Route::post('/chat/send/v1',[ChatController::class,"sendV1"])->name('chat.send');
-    Route::post('/chat/send/v2',[ChatController::class,"sendV2"])->name('chat.send');
-    Route::post('/chat/send/v3',[ChatController::class,"sendV3"])->name('chat.send');
-    Route::post('/chat/send/v4',[ChatController::class,"sendV4"])->name('chat.send');
+    Route::post('/chat/send/v1',[ChatController::class,"sendV1"])->name('chat.send.v1');
+    Route::post('/chat/send/v2',[ChatController::class,"sendV2"])->name('chat.send.v2');
+    Route::post('/chat/send/v3',[ChatController::class,"sendV3"])->name('chat.send.v3');
+    Route::post('/chat/send/v4',[ChatController::class,"sendV4"])->name('chat.send.v4');
+    Route::post('/chat/send/v5',[ChatController::class,"sendV5"])->name('chat.send.v5');
 
     // profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -42,7 +42,6 @@ class ChatController extends Controller
 
                 //  Extract text from pdf
                 $extractedText = $this->pdfToText($file->getRealPath());
-
                 // Prepare prompt for chat
                 $finalPrompt = "Document Content:\n" . $extractedText . "\n\nQuestion: " . $prompt;
 
@@ -254,6 +253,57 @@ class ChatController extends Controller
         } catch (\Throwable $th) {
             DB::rollBack();
             throw $th;
+        } finally{
+            if(isset($image_urls)){
+                $this->deleteImagesFromS3($image_urls);
+            }
+        }
+    }
+
+    public function sendV5(ChatRequest $request)
+    {
+        try {
+            $prompt = $request->validated("prompt");
+            $file = $request->validated("file");
+            // initialize final prompt
+            $final_prompt = "";
+            
+            // try to get text from the PDF  
+            $extracted_text = $this->pdfToText($file->getRealPath());
+            if(strlen($extracted_text) > 100 ){
+                $final_prompt = "Document Content:\n" . $extracted_text . "\n\nQuestion: " . $prompt;
+            }else{
+                // if the text not reach the threshold (100 characters)
+                // transform pdf to images then upload to cloud then send prompt with image urls
+                $image_paths = $this->pdfToImages($file->getRealPath());
+                $image_urls = $this->uploadImagesToS3($image_paths);
+                $images_prompt = array_map(fn($image_url) => [
+                    "type" => "image_url",
+                    "image_url" => [
+                        "url" => $image_url,
+                    ],
+                ], $image_urls);
+                $prompt = [
+                    [
+                        "type"=>"text",
+                        "text"=> $request->validated("prompt"),
+                    ]
+                ];
+                $final_prompt = array_merge($prompt,$images_prompt);
+            }
+            // Send prompt to GPT
+            $result = $this->createChatClient($final_prompt);
+            $response = $result->choices[0]->message->content;
+            return Inertia::render('Chat/Index', [
+                "response" => $response,
+            ]);
+        } catch (\Throwable $th) {
+            throw $th;
+        } finally{
+            // remove images from cloud
+            if(isset($image_urls)){
+                $this->deleteImagesFromS3($image_urls);
+            }
         }
     }
 
@@ -334,35 +384,10 @@ class ChatController extends Controller
         }
         return $urls;
     }
+
+    private function deleteImagesFromS3(array $image_urls){
+        $file_paths = array_map(fn($url) => basename(parse_url($url, PHP_URL_PATH)), $image_urls);
+        return Storage::disk('s3')->delete($file_paths);
+    }
     
-    // public function createAssistantClient()
-    // {
-    //     return OpenAI::assistants()->create([
-    //         'instructions' => 'Summarize the content of the contract vector store',
-    //         'name' => 'Summarizer',
-    //         'tools' => [
-    //             [
-    //                 'type' => 'file_search',
-    //             ],
-    //         ],
-    //         'model' => 'gpt-4',
-    //     ]);
-    // }
-    
-    // public function uploadFile($file){
-    //     $response = OpenAI::files()->upload([
-    //         'purpose' => 'assistants',
-    //         'file' => fopen($file->getRealPath(), 'r'),
-    //     ]);
-    
-    //     $file_id = $response->id;
-    //     OpenAI::vectorStores()->batches()->create(
-    //         vectorStoreId: 'vs_fb1i4pMrIPp2Qa0kBekpQakJ',
-    //         parameters: [
-    //             'file_ids' => [
-    //                 $file_id
-    //             ],
-    //         ]
-    //     );
-    // }
 }

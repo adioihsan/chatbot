@@ -68,6 +68,7 @@ export default function Dashboard({response}) {
                         <option value="/chat/send/v2">V2 - Parse File to text using OCR </option>
                         <option value="/chat/send/v3">V3 - Parse File to image base64</option>
                         <option value="/chat/send/v4">V4 - Parse File to image url</option>
+                        <option value="/chat/send/v5">V5 - Auto Parse File to text/image url</option>
                 </select>
                 </div>
             }
