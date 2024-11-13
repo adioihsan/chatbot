@@ -276,11 +276,13 @@ class ChatController extends Controller
     {
         $images = [];
         $imagick = new Imagick();
+        $imagick->setResolution(200, 200);
         $imagick->readImage($pdfPath);
 
         foreach ($imagick as $pageNumber => $page) {
-            $page->setImageFormat('png');
-            $tempImagePath = sys_get_temp_dir() . "/page_{$pageNumber}_" . uniqid() . ".png";
+            $page->setImageFormat('jpeg');
+            $page->setImageCompressionQuality(75);
+            $tempImagePath = sys_get_temp_dir() . "/page_{$pageNumber}_" . uniqid() . ".jpeg";
             $page->writeImage($tempImagePath);
             $images[] = $tempImagePath;
         }
