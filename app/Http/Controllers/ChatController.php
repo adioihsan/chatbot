@@ -391,8 +391,8 @@ class ChatController extends Controller
     }
 
     private function deleteImagesFromS3(array $image_urls){
-        $file_paths = array_map(fn($url) => basename(parse_url($url, PHP_URL_PATH)), $image_urls);
-        return Storage::disk('s3')->delete($file_paths);
+        // $file_paths = array_map(fn($url) => basename(parse_url($url, PHP_URL_PATH)), $image_urls);
+        // return Storage::disk('s3')->delete($file_paths);
     }
     
 }
