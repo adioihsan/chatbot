@@ -332,6 +332,11 @@ class ChatController extends Controller
         foreach ($imagick as $pageNumber => $page) {
             $page->setImageFormat('jpeg');
             $page->setImageCompressionQuality(75);
+
+            $width = $page->getImageWidth() / 3;
+            $height = $page->getImageHeight() / 3;
+            $page->resizeImage($width, $height, Imagick::FILTER_LANCZOS, 1);
+
             $tempImagePath = sys_get_temp_dir() . "/page_{$pageNumber}_" . uniqid() . ".jpeg";
             $page->writeImage($tempImagePath);
             $images[] = $tempImagePath;
@@ -386,8 +391,8 @@ class ChatController extends Controller
     }
 
     private function deleteImagesFromS3(array $image_urls){
-        $file_paths = array_map(fn($url) => basename(parse_url($url, PHP_URL_PATH)), $image_urls);
-        return Storage::disk('s3')->delete($file_paths);
+        // $file_paths = array_map(fn($url) => basename(parse_url($url, PHP_URL_PATH)), $image_urls);
+        // return Storage::disk('s3')->delete($file_paths);
     }
     
 }
