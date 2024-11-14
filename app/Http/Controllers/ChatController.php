@@ -333,8 +333,8 @@ class ChatController extends Controller
             $page->setImageFormat('jpeg');
             $page->setImageCompressionQuality(75);
 
-            $width = $page->getImageWidth() / 3;
-            $height = $page->getImageHeight() / 3;
+            $width = $page->getImageWidth() / 2;
+            $height = $page->getImageHeight() / 2;
             $page->resizeImage($width, $height, Imagick::FILTER_LANCZOS, 1);
 
             $tempImagePath = sys_get_temp_dir() . "/page_{$pageNumber}_" . uniqid() . ".jpeg";
