@@ -274,15 +274,14 @@ class ChatController extends Controller
                 $final_prompt = "Document Content:\n" . $extracted_text . "\n\nQuestion: " . $prompt;
             }else{
                 // if the text not reach the threshold (100 characters)
-                // transform pdf to images then upload to cloud then send prompt with image urls
-                $image_paths = $this->pdfToImages($file->getRealPath());
-                $image_urls = $this->uploadImagesToS3($image_paths);
+                // transform pdf to images base64
+                $image_paths = $this->pdfToImagesBase64($file->getRealPath());
                 $images_prompt = array_map(fn($image_url) => [
                     "type" => "image_url",
                     "image_url" => [
                         "url" => $image_url,
                     ],
-                ], $image_urls);
+                ], $image_paths);
                 $prompt = [
                     [
                         "type"=>"text",
@@ -306,6 +305,7 @@ class ChatController extends Controller
             }
         }
     }
+    
 
     private function createChatClient($prompt)
     {
@@ -356,6 +356,11 @@ class ChatController extends Controller
 
         foreach ($imagick as $pageNumber => $page) {
             $page->setImageFormat('jpeg');
+            $page->setImageCompressionQuality(75);
+
+            $width = $page->getImageWidth() / 3;
+            $height = $page->getImageHeight() / 3;
+            $page->resizeImage($width, $height, Imagick::FILTER_LANCZOS, 1);
 
             // Get image blob and convert it to base64
             $imageBlob = $page->getImageBlob();
